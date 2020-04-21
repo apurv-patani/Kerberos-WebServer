@@ -49,21 +49,6 @@ def handle_client(*args):
                 ret = bToHex(encrypt(str(ts5+1),hexToB(Kcv))) # sending ts5+1 as ack
                 sock_send(sock, ret.encode('utf-8'))
 
-            elif(opcode=="verifyID"):
-                if(hashfunc(data[1])!=data[2]):
-                    print("Hash not Verified")
-                    continue
-                licenseID = decrypt(hexToB(data[1]),hexToB(Kcv))
-                if(licenseID in licenseData.keys()):
-                    license = bToHex(encrypt(licenseData[licenseID],hexToB(Kcv)))
-                    # [ID || Name || Validity || VehicleType]
-                    print("For licenseID",licenseID,
-                        "send info:",license)
-                else:
-                    license = "License with that ID doesn't exist."
-                    print(license)
-                    license = bToHex(encrypt(license,hexToB(Kcv)))
-                sock_send(sock, "||".join([license,hashfunc(license)]).encode('utf-8'))
             elif(opcode=="useHash"):
                 # client and server decide on a common hash
                 data[1] = decrypt(hexToB(data[1]),hexToB(Kcv))
@@ -71,10 +56,17 @@ def handle_client(*args):
                     hashfunc = lambda x : hashlib.sha256(x.encode()).hexdigest()
                 else:
                     continue
+                    
             elif (opcode == "exit"):
                 sock_send(sock , "GoodBye".encode('utf-8'))
                 return
 
+            elif (opcode == "getPage"):
+                page = (open("dummy.html", "r")).read()
+                license = bToHex(encrypt(page,hexToB(Kcv)))
+                print("Sending homepage...\n")
+                sock_send(sock, "||".join([license,hashfunc(license)]).encode('utf-8'))
+                # [E(html) || hash(E(html))]
             else:
                 # data = ":".join(data)
                 # sock_send(sock, data.encode('utf-8'))

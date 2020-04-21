@@ -28,4 +28,6 @@ def passToKey(passwd):
 
 def getRandStr(len):
 	# generate random string of length 'len'
-	return ''.join(random.choices(string.ascii_uppercase+string.ascii_lowercase+string.digits, k = len)) 
+	return ''.join(random.choices(string.ascii_uppercase+string.ascii_lowercase+string.digits, k = len))
+
+# print(passToKey("justforthelolz"))

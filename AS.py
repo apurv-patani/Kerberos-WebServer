@@ -35,7 +35,7 @@ def handle_client(*args):
                 # E(Ktgs , [K c,tgs || IDc || ADc || IDtgs || TS2 || Lifetime2 ])
                 print("Generated ticketTGS:",ticketTGS)
                 mC = "||".join([Kctgs,str(IDtgs),str(time.time()),'100',ticketTGS])
-                ret = bToHex(encrypt(mC,keyC))
+                ret = bToHex(encrypt(mC,clientPass[int(IDc)]))
                 # E(Kc , [Kc,tgs || IDtgs || TS2 || Lifetime2 || Tickettgs])
                 sock_send(sock, ret.encode('utf-8'))
 

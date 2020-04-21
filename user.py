@@ -2,7 +2,7 @@ import socket
 import sys
 import time, threading
 from DES import *
-ID = 1
+ID = 0
 IDtgs = 2
 tTGS = None
 Kctgs = None
@@ -107,29 +107,18 @@ def client():
                 else:
                     print("Server Not Authenticated.")
 
-            elif(data=="verifyID"):
-                encrypted = bToHex(encrypt(tokens[1],hexToB(Kcv)))
-                 # E(Kc,v , [ID]) (enc)
-                toSend = "||".join([data,encrypted,hashfunc(encrypted)]) 
-                # ["verifyID" || enc || hash(enc)]
-                print("Requesting license info:",toSend)
-                sock_send(sock ,toSend.encode('utf-8'))
+            elif(data=="getPage"):
+                print("Requesting homepage")
+                sock_send(sock ,data.encode('utf-8'))
+                # [getPage]
                 recv = sock.recv(4096).decode('utf-8').split("||") 
                 # [data || hash(data)]
+
                 if(hashfunc(recv[0])!=recv[1]):
                     print("Hash NOT Verified!")
                     continue
-                license = decrypt(hexToB(recv[0]),hexToB(Kcv)).split("||") 
-                # [ID || Name || Validity || VehicleType]
-                print("Received Info:-")
-                if(len(license)==1):
-                    print(license[0])
-                    continue
-                else: 
-                    print("License No.:",license[0])
-                    print("Name:",license[1])
-                    print("Validity:",license[2]=="1")
-                    print("Vehicle Type:",license[3])
+                homepage = decrypt(hexToB(recv[0]),hexToB(Kcv))
+                print("Received homepage\n",homepage)
 
             elif(data == "connect"):
                 host = '192.168.1.9'
